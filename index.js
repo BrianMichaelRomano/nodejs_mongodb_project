@@ -121,7 +121,8 @@ handlers._newbies.put = (parsedReq, res) => {
 };
 
 handlers._newbies.delete = (parsedReq, res) => {
-    databaseCalls.delete('5b0aa0c85e78b6330ccd5ac6')
+    const newbieId = parsedReq.queryStringObject.id;        
+    databaseCalls.delete(newbieId)
     .then((result) => {
         res.writeHead(200,{'Content-Type' : 'application/json'});
         const resultToString = JSON.stringify(result.value);
