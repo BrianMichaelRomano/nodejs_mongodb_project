@@ -82,7 +82,7 @@ handlers.newbies = (parsedReq, res) => {
 
 handlers._newbies = {};
 
-handlers._newbies.post = async (parsedReq, res) => {
+handlers._newbies.post = (parsedReq, res) => {
 
     const newbie = JSON.parse(parsedReq.payload);
     databaseCalls.create(newbie)
