@@ -7,14 +7,15 @@ const handlers = {};
 const databaseCalls = {};
 let db;
 
-MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true })
-    .then(client => {
+(async () => {
+    try{
+        const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
         db = client.db('Noob-List');
         console.log("Connected correctly to server");
-    })
-    .catch(err => {
+    } catch(err) {
         console.log(err);
-    });
+    }
+})();
 
 databaseCalls.create = async (newbie) => {
     try {
