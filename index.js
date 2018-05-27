@@ -8,42 +8,78 @@ const handlers = {};
 const databaseCalls = {};
 
 databaseCalls.create = async (newbie) => {
-            const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
-            console.log("Connected correctly to server");
-            const db = client.db('Noob-List');
-            const result = await db.collection('newbies').insertOne(newbie);
+    let client;
+    try {
+        client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
+        console.log("Connected correctly to server");
+        const db = client.db('Noob-List');
+        const result = await db.collection('newbies').insertOne(newbie);
+        return result;
+    } catch(err) {
+        console.log(err);
+        throw err;
+    } finally {
+        if(client) {
             client.close();
-            return result;
+        }
+    }
 };
 
 databaseCalls.read = async (newbieId) => {
-            const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
-            const id = new ObjectId(newbieId);
-            console.log("Connected correctly to server");
-            const db = client.db('Noob-List');
-            const result = await db.collection('newbies').findOne({ _id : id});
+    let client;
+    try {
+        client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
+        const id = new ObjectId(newbieId);
+        console.log("Connected correctly to server");
+        const db = client.db('Noob-List');
+        const result = await db.collection('newbies').findOne({ _id : id});
+        return result;
+    } catch(err) {
+        console.log(err);
+        throw err;
+    } finally {
+        if(client) {
             client.close();
-            return result;
+        }
+    }
 };
 
 databaseCalls.update = async (newbieId, newbie) => {
-            const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
-            const id = new ObjectId(newbieId);
-            console.log("Connected correctly to server");
-            const db = client.db('Noob-List');
-            const result = await db.collection('newbies').findOneAndUpdate({ _id : id}, newbie, { returnOriginal : false });
+    let client;
+    try {   
+        client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
+        const id = new ObjectId(newbieId);
+        console.log("Connected correctly to server");
+        const db = client.db('Noob-List');
+        const result = await db.collection('newbies').findOneAndUpdate({ _id : id}, newbie, { returnOriginal : false });
+        return result; 
+    } catch(err) {
+        console.log(err);
+        throw err;
+    } finally {
+        if(client) {
             client.close();
-            return result;            
+        }
+    }           
 };
 
 databaseCalls.delete = async (newbieId) => {
-            const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
-            const id = new ObjectId(newbieId);
-            console.log("Connected correctly to server");
-            const db = client.db('Noob-List');
-            const result = await db.collection('newbies').findOneAndDelete({ _id : id});
+    let client;    
+    try {
+        client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
+        const id = new ObjectId(newbieId);
+        console.log("Connected correctly to server");
+        const db = client.db('Noob-List');
+        const result = await db.collection('newbies').findOneAndDelete({ _id : id});
+        return result;
+    } catch(err) {
+        console.log(err);
+        throw err;
+    } finally {
+        if(client) {
             client.close();
-            return result;
+        }
+    }    
 };
 
 handlers.newbies = (parsedReq, res) => {
