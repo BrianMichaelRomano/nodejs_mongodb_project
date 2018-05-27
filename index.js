@@ -3,6 +3,24 @@ const url = require('url');
 
 const handlers = {};
 
+const databaseCalls = {};
+
+databaseCalls.create = (newbie) => {
+
+};
+
+databaseCalls.read = (newbieId) => {
+
+};
+
+databaseCalls.update = (newbieId, newbie) => {
+
+};
+
+databaseCalls.delete = (newbieId) => {
+
+};
+
 handlers.newbies = (parsedReq, res) => {
     const acceptedMethods = ['get', 'post', 'put', 'delete'];
     if(acceptedMethods.indexOf(parsedReq.method) > -1) {
