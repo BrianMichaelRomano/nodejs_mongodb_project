@@ -23,29 +23,18 @@ databaseCalls.create = async (newbie) => {
     } catch(err) {
         console.log(err);
         throw err;
-    } finally {
-        if(client) {
-            client.close();
-        }
     }
 };
 
 databaseCalls.read = async (newbieId) => {
     let client;
     try {
-        client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
         const id = new ObjectId(newbieId);
-        console.log("Connected correctly to server");
-        const db = client.db('Noob-List');
         const result = await db.collection('newbies').findOne({ _id : id});
         return result;
     } catch(err) {
         console.log(err);
         throw err;
-    } finally {
-        if(client) {
-            client.close();
-        }
     }
 };
 
