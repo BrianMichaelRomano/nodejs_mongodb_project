@@ -108,7 +108,9 @@ handlers._newbies.get = (parsedReq, res) => {
 };
 
 handlers._newbies.put = (parsedReq, res) => {
-    databaseCalls.update('5b0aa0c85e78b6330ccd5ac6', { 'name': 'Nathan' })
+    const newbie = JSON.parse(parsedReq.payload);
+    const newbieId = parsedReq.queryStringObject.id;    
+    databaseCalls.update(newbieId, newbie)
     .then((result) => {
         res.writeHead(200,{'Content-Type' : 'application/json'});
         const resultToString = JSON.stringify(result.value);
