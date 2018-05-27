@@ -83,7 +83,9 @@ handlers.newbies = (parsedReq, res) => {
 handlers._newbies = {};
 
 handlers._newbies.post = async (parsedReq, res) => {
-    databaseCalls.create({ 'name': 'Brian' })
+
+    const newbie = JSON.parse(parsedReq.payload);
+    databaseCalls.create(newbie)
         .then((result) => {
             res.writeHead(200,{'Content-Type' : 'application/json'});
             const resultToString = JSON.stringify(result.ops[0]);
@@ -94,7 +96,8 @@ handlers._newbies.post = async (parsedReq, res) => {
 };
 
 handlers._newbies.get = (parsedReq, res) => {
-    databaseCalls.read('5b0aa0c85e78b6330ccd5ac6')
+    const newbieId = parsedReq.queryStringObject.id;
+    databaseCalls.read(newbieId)
         .then((result) => {
             res.writeHead(200,{'Content-Type' : 'application/json'});
             const resultToString = JSON.stringify(result);
@@ -144,10 +147,20 @@ const server = http.createServer((req, res) => {
     parsedReq.method = req.method.toLowerCase();
     parsedReq.queryStringObject = parsedReq.parsedUrl.query;
 
-    const routedHandler = typeof (router[parsedReq.trimmedPath]) !== 'undefined' ? router[parsedReq.trimmedPath] : handlers.notFound;
+    let body = [];
 
-    routedHandler(parsedReq, res);
+    req.on('data', (chunk) => {
+        body.push(chunk);
+    });
 
+    req.on('end', (chunk) => {
+        body = Buffer.concat(body).toString();
+        parsedReq.payload = body;
+
+        const routedHandler = typeof (router[parsedReq.trimmedPath]) !== 'undefined' ? router[parsedReq.trimmedPath] : handlers.notFound;
+    
+        routedHandler(parsedReq, res);
+    });
 });
 
 server.listen(3000, () => console.log('Listening on port 3000...'));
