@@ -7,67 +7,43 @@ const handlers = {};
 
 const databaseCalls = {};
 
-databaseCalls.create = (newbie) => {
-    return new Promise(async (resolve, reject) => {
-        try {
+databaseCalls.create = async (newbie) => {
             const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
             console.log("Connected correctly to server");
             const db = client.db('Noob-List');
             const result = await db.collection('newbies').insertOne(newbie);
             client.close();
-            resolve(result);
-        } catch(err) {
-            console.log(err);
-        }
-    });
+            return result;
 };
 
-databaseCalls.read = (newbieId) => {
-    return new Promise(async (resolve, reject) => {
-        try {
+databaseCalls.read = async (newbieId) => {
             const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
             const id = new ObjectId(newbieId);
             console.log("Connected correctly to server");
             const db = client.db('Noob-List');
             const result = await db.collection('newbies').findOne({ _id : id});
             client.close();
-            resolve(result);
-        } catch(err) {
-            console.log(err);
-        }
-    });
+            return result;
 };
 
-databaseCalls.update = (newbieId, newbie) => {
-    return new Promise(async (resolve, reject) => {
-        try {
+databaseCalls.update = async (newbieId, newbie) => {
             const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
             const id = new ObjectId(newbieId);
             console.log("Connected correctly to server");
             const db = client.db('Noob-List');
             const result = await db.collection('newbies').findOneAndUpdate({ _id : id}, newbie, { returnOriginal : false });
             client.close();
-            resolve(result);
-        } catch(err) {
-            console.log(err);
-        }
-    });
+            return result;            
 };
 
-databaseCalls.delete = (newbieId) => {
-    return new Promise(async (resolve, reject) => {
-        try {
+databaseCalls.delete = async (newbieId) => {
             const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
             const id = new ObjectId(newbieId);
             console.log("Connected correctly to server");
             const db = client.db('Noob-List');
             const result = await db.collection('newbies').findOneAndDelete({ _id : id});
             client.close();
-            resolve(result);
-        } catch(err) {
-            console.log(err);
-        }
-    });
+            return result;
 };
 
 handlers.newbies = (parsedReq, res) => {
