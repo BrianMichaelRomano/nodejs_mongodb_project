@@ -41,20 +41,13 @@ databaseCalls.read = async (newbieId) => {
 databaseCalls.update = async (newbieId, newbie) => {
     let client;
     try {   
-        client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
         const id = new ObjectId(newbieId);
-        console.log("Connected correctly to server");
-        const db = client.db('Noob-List');
         const result = await db.collection('newbies').findOneAndUpdate({ _id : id}, newbie, { returnOriginal : false });
         return result; 
     } catch(err) {
         console.log(err);
         throw err;
-    } finally {
-        if(client) {
-            client.close();
-        }
-    }           
+    }      
 };
 
 databaseCalls.delete = async (newbieId) => {
