@@ -27,7 +27,6 @@ databaseCalls.create = async (newbie) => {
 };
 
 databaseCalls.read = async (newbieId) => {
-    let client;
     try {
         const id = new ObjectId(newbieId);
         const result = await db.collection('newbies').findOne({ _id : id});
@@ -39,7 +38,6 @@ databaseCalls.read = async (newbieId) => {
 };
 
 databaseCalls.update = async (newbieId, newbie) => {
-    let client;
     try {   
         const id = new ObjectId(newbieId);
         const result = await db.collection('newbies').findOneAndUpdate({ _id : id}, newbie, { returnOriginal : false });
@@ -50,8 +48,7 @@ databaseCalls.update = async (newbieId, newbie) => {
     }      
 };
 
-databaseCalls.delete = async (newbieId) => {
-    let client;    
+databaseCalls.delete = async (newbieId) => {  
     try {
         const id = new ObjectId(newbieId);
         const result = await db.collection('newbies').findOneAndDelete({ _id : id});
