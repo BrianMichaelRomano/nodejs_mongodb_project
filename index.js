@@ -1,4 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
+const ObjectId = require('mongodb').ObjectId;
 const http = require('http');
 const url = require('url');
 
@@ -7,38 +8,71 @@ const handlers = {};
 const databaseCalls = {};
 
 databaseCalls.create = (newbie) => {
-    return new Promise((resolve, reject) => {
-
-        const url = 'mongodb://localhost:27017';
-        const dbName = 'Noob-List';
-    
-        MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
             console.log("Connected correctly to server");
-    
-            const db = client.db(dbName);
-    
-            db.collection('newbies').insertOne(newbie, function (err, r) {
-                client.close();
-                resolve(r);
-            });
-        });
+            const db = client.db('Noob-List');
+            const result = await db.collection('newbies').insertOne(newbie);
+            client.close();
+            resolve(result);
+        } catch(err) {
+            console.log(err);
+        }
     });
 };
 
 databaseCalls.read = (newbieId) => {
-
+    return new Promise(async (resolve, reject) => {
+        try {
+            const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
+            const id = new ObjectId(newbieId);
+            console.log("Connected correctly to server");
+            const db = client.db('Noob-List');
+            const result = await db.collection('newbies').findOne({ _id : id});
+            client.close();
+            resolve(result);
+        } catch(err) {
+            console.log(err);
+        }
+    });
 };
 
 databaseCalls.update = (newbieId, newbie) => {
-
+    return new Promise(async (resolve, reject) => {
+        try {
+            const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
+            const id = new ObjectId(newbieId);
+            console.log("Connected correctly to server");
+            const db = client.db('Noob-List');
+            const result = await db.collection('newbies').findOneAndUpdate({ _id : id}, newbie, { returnOriginal : false });
+            client.close();
+            resolve(result);
+        } catch(err) {
+            console.log(err);
+        }
+    });
 };
 
 databaseCalls.delete = (newbieId) => {
-
+    return new Promise(async (resolve, reject) => {
+        try {
+            const client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
+            const id = new ObjectId(newbieId);
+            console.log("Connected correctly to server");
+            const db = client.db('Noob-List');
+            const result = await db.collection('newbies').findOneAndDelete({ _id : id});
+            client.close();
+            resolve(result);
+        } catch(err) {
+            console.log(err);
+        }
+    });
 };
 
 handlers.newbies = (parsedReq, res) => {
     const acceptedMethods = ['get', 'post', 'put', 'delete'];
+
     if (acceptedMethods.indexOf(parsedReq.method) > -1) {
         handlers._newbies[parsedReq.method](parsedReq, res);
     } else {
@@ -51,22 +85,45 @@ handlers._newbies = {};
 handlers._newbies.post = async (parsedReq, res) => {
     databaseCalls.create({ 'name': 'Brian' })
         .then((result) => {
-            console.log(JSON.stringify(result.ops, null, 1));
-            res.end('POST: Newbies');
+            res.writeHead(200,{'Content-Type' : 'application/json'});
+            const resultToString = JSON.stringify(result.ops[0]);
+            res.write(resultToString);
+            res.end();
         })
         .catch(err => console.log(err));
 };
 
 handlers._newbies.get = (parsedReq, res) => {
-    res.end('GET: Newbies');
+    databaseCalls.read('5b0aa0c85e78b6330ccd5ac6')
+        .then((result) => {
+            res.writeHead(200,{'Content-Type' : 'application/json'});
+            const resultToString = JSON.stringify(result);
+            res.write(resultToString);
+            res.end();
+        })
+        .catch(err => console.log(err));
 };
 
 handlers._newbies.put = (parsedReq, res) => {
-    res.end('PUT: Newbies');
+    databaseCalls.update('5b0aa0c85e78b6330ccd5ac6', { 'name': 'Nathan' })
+    .then((result) => {
+        res.writeHead(200,{'Content-Type' : 'application/json'});
+        const resultToString = JSON.stringify(result.value);
+        res.write(resultToString);
+        res.end();
+    })
+    .catch(err => console.log(err));
 };
 
 handlers._newbies.delete = (parsedReq, res) => {
-    res.end('DELETE: Newbies');
+    databaseCalls.delete('5b0aa0c85e78b6330ccd5ac6')
+    .then((result) => {
+        res.writeHead(200,{'Content-Type' : 'application/json'});
+        const resultToString = JSON.stringify(result.value);
+        res.write(resultToString);
+        res.end();
+    })
+    .catch(err => console.log(err));
 };
 
 handlers.notFound = (parsedReq, res) => {
