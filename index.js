@@ -4,15 +4,20 @@ const http = require('http');
 const url = require('url');
 
 const handlers = {};
-
 const databaseCalls = {};
+let db;
+
+MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true })
+    .then(client => {
+        db = client.db('Noob-List');
+        console.log("Connected correctly to server");
+    })
+    .catch(err => {
+        console.log(err);
+    });
 
 databaseCalls.create = async (newbie) => {
-    let client;
     try {
-        client = await MongoClient.connect('mongodb://localhost:27017', { useNewUrlParser: true });
-        console.log("Connected correctly to server");
-        const db = client.db('Noob-List');
         const result = await db.collection('newbies').insertOne(newbie);
         return result;
     } catch(err) {
