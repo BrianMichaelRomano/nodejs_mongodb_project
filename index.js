@@ -1,3 +1,4 @@
+const MongoClient = require('mongodb').MongoClient;
 const http = require('http');
 const url = require('url');
 
@@ -6,7 +7,22 @@ const handlers = {};
 const databaseCalls = {};
 
 databaseCalls.create = (newbie) => {
+    return new Promise((resolve, reject) => {
 
+        const url = 'mongodb://localhost:27017';
+        const dbName = 'Noob-List';
+    
+        MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+            console.log("Connected correctly to server");
+    
+            const db = client.db(dbName);
+    
+            db.collection('newbies').insertOne(newbie, function (err, r) {
+                client.close();
+                resolve(r);
+            });
+        });
+    });
 };
 
 databaseCalls.read = (newbieId) => {
@@ -23,16 +39,22 @@ databaseCalls.delete = (newbieId) => {
 
 handlers.newbies = (parsedReq, res) => {
     const acceptedMethods = ['get', 'post', 'put', 'delete'];
-    if(acceptedMethods.indexOf(parsedReq.method) > -1) {
+    if (acceptedMethods.indexOf(parsedReq.method) > -1) {
         handlers._newbies[parsedReq.method](parsedReq, res);
     } else {
         res.end('Method not valid...');
     }
 };
+
 handlers._newbies = {};
 
-handlers._newbies.post = (parsedReq, res) => {
-    res.end('POST: Newbies');
+handlers._newbies.post = async (parsedReq, res) => {
+    databaseCalls.create({ 'name': 'Brian' })
+        .then((result) => {
+            console.log(JSON.stringify(result.ops, null, 1));
+            res.end('POST: Newbies');
+        })
+        .catch(err => console.log(err));
 };
 
 handlers._newbies.get = (parsedReq, res) => {
@@ -52,7 +74,7 @@ handlers.notFound = (parsedReq, res) => {
 };
 
 const router = {
-    'newbies' : handlers.newbies
+    'newbies': handlers.newbies
 };
 
 const server = http.createServer((req, res) => {
@@ -65,7 +87,7 @@ const server = http.createServer((req, res) => {
     parsedReq.method = req.method.toLowerCase();
     parsedReq.queryStringObject = parsedReq.parsedUrl.query;
 
-    const routedHandler = typeof(router[parsedReq.trimmedPath]) !== 'undefined' ? router[parsedReq.trimmedPath] : handlers.notFound;
+    const routedHandler = typeof (router[parsedReq.trimmedPath]) !== 'undefined' ? router[parsedReq.trimmedPath] : handlers.notFound;
 
     routedHandler(parsedReq, res);
 
